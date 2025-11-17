@@ -1,0 +1,3 @@
+# Proteger datos JSON de acceso directo
+Order Deny,Allow
+Deny from all
