@@ -2,6 +2,8 @@
 
 Un emocionante juego HTML5 estilo "Balls Versus Blocks" completamente optimizado para dispositivos móviles con sistema de puntuación global y base de datos.
 
+> **⚡ ¿Quieres empezar YA?** Lee [QUICKSTART.md](QUICKSTART.md) para instalación en 30 segundos.
+
 ## 🌟 Características
 
 - ✅ **Totalmente optimizado para móviles** - Controles táctiles intuitivos
