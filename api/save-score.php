@@ -4,12 +4,22 @@ header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: POST');
 header('Access-Control-Allow-Headers: Content-Type');
 
-require_once __DIR__ . '/../database/config.php';
-
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
     echo json_encode(['success' => false, 'error' => 'Método no permitido']);
     exit;
+}
+
+// Rutas de archivos JSON
+$leaderboardFile = __DIR__ . '/../data/leaderboard.json';
+
+// Crear carpeta y archivo si no existen
+if (!is_dir(__DIR__ . '/../data')) {
+    mkdir(__DIR__ . '/../data', 0777, true);
+}
+
+if (!file_exists($leaderboardFile)) {
+    file_put_contents($leaderboardFile, '[]');
 }
 
 try {
@@ -39,70 +49,71 @@ try {
         exit;
     }
 
-    $pdo = getDbConnection();
-    $pdo->beginTransaction();
+    // Leer leaderboard actual
+    $leaderboard = json_decode(file_get_contents($leaderboardFile), true) ?: [];
 
-    // Buscar o crear jugador
-    $stmt = $pdo->prepare('SELECT id FROM players WHERE username = ?');
-    $stmt->execute([$username]);
-    $player = $stmt->fetch();
-
-    if (!$player) {
-        $stmt = $pdo->prepare('INSERT INTO players (username) VALUES (?)');
-        $stmt->execute([$username]);
-        $playerId = $pdo->lastInsertId();
-    } else {
-        $playerId = $player['id'];
-    }
-
-    // Guardar puntuación
-    $stmt = $pdo->prepare('INSERT INTO scores (player_id, score, level_reached, balls_count) VALUES (?, ?, ?, ?)');
-    $stmt->execute([$playerId, $score, $level, $ballsCount]);
-
-    // Actualizar o crear registro en leaderboard
-    $stmt = $pdo->prepare('SELECT id, best_score, total_games FROM leaderboard WHERE player_id = ?');
-    $stmt->execute([$playerId]);
-    $leaderboardEntry = $stmt->fetch();
-
-    if (!$leaderboardEntry) {
-        $stmt = $pdo->prepare('INSERT INTO leaderboard (player_id, best_score, best_level, total_games) VALUES (?, ?, ?, 1)');
-        $stmt->execute([$playerId, $score, $level]);
-        $isNewRecord = true;
-    } else {
-        $isNewRecord = $score > $leaderboardEntry['best_score'];
-        if ($isNewRecord) {
-            $stmt = $pdo->prepare('UPDATE leaderboard SET best_score = ?, best_level = ?, total_games = total_games + 1 WHERE player_id = ?');
-            $stmt->execute([$score, $level, $playerId]);
-        } else {
-            $stmt = $pdo->prepare('UPDATE leaderboard SET total_games = total_games + 1 WHERE player_id = ?');
-            $stmt->execute([$playerId]);
+    // Buscar jugador existente
+    $playerIndex = -1;
+    foreach ($leaderboard as $index => $player) {
+        if ($player['username'] === $username) {
+            $playerIndex = $index;
+            break;
         }
     }
 
-    // Obtener ranking actual del jugador
-    $stmt = $pdo->prepare('
-        SELECT COUNT(*) + 1 as ranking
-        FROM leaderboard
-        WHERE best_score > (SELECT best_score FROM leaderboard WHERE player_id = ?)
-    ');
-    $stmt->execute([$playerId]);
-    $rankingData = $stmt->fetch();
-    $ranking = $rankingData['ranking'];
+    $isNewRecord = false;
 
-    $pdo->commit();
+    if ($playerIndex === -1) {
+        // Nuevo jugador
+        $leaderboard[] = [
+            'username' => $username,
+            'best_score' => $score,
+            'best_level' => $level,
+            'total_games' => 1,
+            'last_updated' => date('Y-m-d H:i:s')
+        ];
+        $isNewRecord = true;
+    } else {
+        // Jugador existente
+        $isNewRecord = $score > $leaderboard[$playerIndex]['best_score'];
+
+        if ($isNewRecord) {
+            $leaderboard[$playerIndex]['best_score'] = $score;
+            $leaderboard[$playerIndex]['best_level'] = $level;
+        }
+
+        $leaderboard[$playerIndex]['total_games']++;
+        $leaderboard[$playerIndex]['last_updated'] = date('Y-m-d H:i:s');
+    }
+
+    // Ordenar por mejor puntuación
+    usort($leaderboard, function($a, $b) {
+        return $b['best_score'] - $a['best_score'];
+    });
+
+    // Calcular ranking
+    $ranking = 1;
+    $totalGames = 1;
+    foreach ($leaderboard as $index => $player) {
+        if ($player['username'] === $username) {
+            $ranking = $index + 1;
+            $totalGames = $player['total_games'];
+            break;
+        }
+    }
+
+    // Guardar leaderboard
+    file_put_contents($leaderboardFile, json_encode($leaderboard, JSON_PRETTY_PRINT));
 
     echo json_encode([
         'success' => true,
         'isNewRecord' => $isNewRecord,
         'ranking' => $ranking,
-        'totalGames' => ($leaderboardEntry['total_games'] ?? 0) + 1
+        'totalGames' => $totalGames
     ]);
 
 } catch (Exception $e) {
-    if (isset($pdo)) {
-        $pdo->rollBack();
-    }
     http_response_code(500);
-    echo json_encode(['success' => false, 'error' => 'Error al guardar la puntuación']);
+    echo json_encode(['success' => false, 'error' => 'Error al guardar la puntuación: ' . $e->getMessage()]);
 }
 ?>

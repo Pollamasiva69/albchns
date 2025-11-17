@@ -4,36 +4,44 @@ header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET');
 header('Access-Control-Allow-Headers: Content-Type');
 
-require_once __DIR__ . '/../database/config.php';
-
 if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
     http_response_code(405);
     echo json_encode(['success' => false, 'error' => 'Método no permitido']);
     exit;
 }
 
+// Rutas de archivos JSON
+$leaderboardFile = __DIR__ . '/../data/leaderboard.json';
+
+// Crear carpeta y archivo si no existen
+if (!is_dir(__DIR__ . '/../data')) {
+    mkdir(__DIR__ . '/../data', 0777, true);
+}
+
+if (!file_exists($leaderboardFile)) {
+    file_put_contents($leaderboardFile, '[]');
+}
+
 try {
     $limit = isset($_GET['limit']) ? min((int)$_GET['limit'], 100) : 10;
     $username = isset($_GET['username']) ? trim($_GET['username']) : null;
 
-    $pdo = getDbConnection();
+    // Leer leaderboard
+    $leaderboard = json_decode(file_get_contents($leaderboardFile), true) ?: [];
 
-    // Obtener top scores
-    $stmt = $pdo->prepare('
-        SELECT
-            p.username,
-            l.best_score,
-            l.best_level,
-            l.total_games,
-            l.last_updated,
-            (SELECT COUNT(*) + 1 FROM leaderboard l2 WHERE l2.best_score > l.best_score) as ranking
-        FROM leaderboard l
-        INNER JOIN players p ON l.player_id = p.id
-        ORDER BY l.best_score DESC
-        LIMIT ?
-    ');
-    $stmt->execute([$limit]);
-    $topScores = $stmt->fetchAll();
+    // Ordenar por mejor puntuación
+    usort($leaderboard, function($a, $b) {
+        return $b['best_score'] - $a['best_score'];
+    });
+
+    // Agregar ranking a cada jugador
+    foreach ($leaderboard as $index => &$player) {
+        $player['ranking'] = $index + 1;
+    }
+    unset($player); // Romper referencia
+
+    // Limitar resultados
+    $topScores = array_slice($leaderboard, 0, $limit);
 
     $response = [
         'success' => true,
@@ -43,23 +51,11 @@ try {
 
     // Si se proporciona un username, incluir su información
     if ($username) {
-        $stmt = $pdo->prepare('
-            SELECT
-                p.username,
-                l.best_score,
-                l.best_level,
-                l.total_games,
-                l.last_updated,
-                (SELECT COUNT(*) + 1 FROM leaderboard l2 WHERE l2.best_score > l.best_score) as ranking
-            FROM leaderboard l
-            INNER JOIN players p ON l.player_id = p.id
-            WHERE p.username = ?
-        ');
-        $stmt->execute([$username]);
-        $playerData = $stmt->fetch();
-
-        if ($playerData) {
-            $response['playerData'] = $playerData;
+        foreach ($leaderboard as $player) {
+            if ($player['username'] === $username) {
+                $response['playerData'] = $player;
+                break;
+            }
         }
     }
 
@@ -67,6 +63,6 @@ try {
 
 } catch (Exception $e) {
     http_response_code(500);
-    echo json_encode(['success' => false, 'error' => 'Error al obtener el leaderboard']);
+    echo json_encode(['success' => false, 'error' => 'Error al obtener el leaderboard: ' . $e->getMessage()]);
 }
 ?>

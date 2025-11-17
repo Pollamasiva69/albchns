@@ -1,5 +1,5 @@
-# Configuración de base de datos
-database/config.php
+# Archivos deprecated (MySQL ya no se usa)
+deprecated/
 
 # Archivos de sistema
 .DS_Store

@@ -1,0 +1,37 @@
+[
+    {
+        "username": "Champion",
+        "best_score": 15000,
+        "best_level": 150,
+        "total_games": 100,
+        "last_updated": "2025-01-15 10:20:00"
+    },
+    {
+        "username": "BallMaster",
+        "best_score": 12000,
+        "best_level": 120,
+        "total_games": 50,
+        "last_updated": "2025-01-15 10:15:00"
+    },
+    {
+        "username": "ProGamer",
+        "best_score": 8500,
+        "best_level": 85,
+        "total_games": 25,
+        "last_updated": "2025-01-15 10:10:00"
+    },
+    {
+        "username": "BlockDestroyer",
+        "best_score": 6500,
+        "best_level": 65,
+        "total_games": 15,
+        "last_updated": "2025-01-15 10:18:00"
+    },
+    {
+        "username": "TestPlayer1",
+        "best_score": 5000,
+        "best_level": 50,
+        "total_games": 10,
+        "last_updated": "2025-01-15 10:05:00"
+    }
+]
