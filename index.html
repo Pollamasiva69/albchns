@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#1a1a2e">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Balls vs Blocks - ¡Destruye los bloques!</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="gameContainer">
+        <!-- Pantalla de inicio -->
+        <div id="startScreen" class="screen active">
+            <div class="logo">
+                <h1>⚡ BALLS vs BLOCKS ⚡</h1>
+                <p class="subtitle">Destruye todos los bloques</p>
+            </div>
+            <div class="stats-preview">
+                <div class="stat-item">
+                    <span class="stat-label">Mejor puntuación</span>
+                    <span class="stat-value" id="bestScoreDisplay">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Nivel máximo</span>
+                    <span class="stat-value" id="bestLevelDisplay">0</span>
+                </div>
+            </div>
+            <input type="text" id="usernameInput" placeholder="Tu nombre" maxlength="20" autocomplete="off">
+            <button id="startButton" class="btn btn-primary">JUGAR</button>
+            <button id="leaderboardButton" class="btn btn-secondary">CLASIFICACIÓN</button>
+        </div>
+
+        <!-- Pantalla de juego -->
+        <div id="gameScreen" class="screen">
+            <div id="gameUI">
+                <div class="ui-top">
+                    <div class="score-display">
+                        <span class="label">Puntos</span>
+                        <span class="value" id="scoreValue">0</span>
+                    </div>
+                    <div class="level-display">
+                        <span class="label">Nivel</span>
+                        <span class="value" id="levelValue">1</span>
+                    </div>
+                    <div class="balls-display">
+                        <span class="label">🎯</span>
+                        <span class="value" id="ballsValue">1</span>
+                    </div>
+                </div>
+            </div>
+            <canvas id="gameCanvas"></canvas>
+            <div id="aimLine"></div>
+        </div>
+
+        <!-- Pantalla de Game Over -->
+        <div id="gameOverScreen" class="screen">
+            <div class="game-over-content">
+                <h2 class="game-over-title">¡JUEGO TERMINADO!</h2>
+                <div class="final-stats">
+                    <div class="stat-item">
+                        <span class="stat-label">Puntuación final</span>
+                        <span class="stat-value" id="finalScore">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Nivel alcanzado</span>
+                        <span class="stat-value" id="finalLevel">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Bolas conseguidas</span>
+                        <span class="stat-value" id="finalBalls">0</span>
+                    </div>
+                </div>
+                <div id="recordMessage" class="record-message"></div>
+                <div id="rankingMessage" class="ranking-message"></div>
+                <div class="buttons">
+                    <button id="playAgainButton" class="btn btn-primary">JUGAR DE NUEVO</button>
+                    <button id="menuButton" class="btn btn-secondary">MENÚ</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pantalla de Leaderboard -->
+        <div id="leaderboardScreen" class="screen">
+            <div class="leaderboard-content">
+                <h2>🏆 CLASIFICACIÓN GLOBAL 🏆</h2>
+                <div id="leaderboardList" class="leaderboard-list">
+                    <div class="loading">Cargando...</div>
+                </div>
+                <div id="playerRank" class="player-rank"></div>
+                <button id="backButton" class="btn btn-secondary">VOLVER</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>

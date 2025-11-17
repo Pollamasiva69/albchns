@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test API - Balls vs Blocks</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: white;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+        }
+        h1 {
+            color: #ff6b6b;
+            text-align: center;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+        }
+        button {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            margin: 5px;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+        }
+        .result {
+            margin-top: 10px;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 5px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        .success {
+            color: #4ecdc4;
+        }
+        .error {
+            color: #ff6b6b;
+        }
+        input {
+            padding: 10px;
+            border-radius: 5px;
+            border: 2px solid #ff6b6b;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            margin: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Test de API - Balls vs Blocks</h1>
+
+        <div class="test-section">
+            <h2>1. Test de Conexión a Base de Datos</h2>
+            <p>Verifica si la base de datos está configurada correctamente.</p>
+            <button onclick="testDatabase()">Probar Conexión</button>
+            <div id="dbResult" class="result"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>2. Test de Guardar Puntuación</h2>
+            <p>Prueba guardar una puntuación de ejemplo.</p>
+            <input type="text" id="testUsername" placeholder="Nombre de prueba" value="TestPlayer">
+            <input type="number" id="testScore" placeholder="Puntuación" value="1000">
+            <button onclick="testSaveScore()">Guardar Puntuación</button>
+            <div id="saveResult" class="result"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>3. Test de Leaderboard</h2>
+            <p>Obtiene las mejores puntuaciones.</p>
+            <button onclick="testLeaderboard()">Cargar Leaderboard</button>
+            <div id="leaderboardResult" class="result"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>4. Información del Sistema</h2>
+            <button onclick="showSystemInfo()">Mostrar Información</button>
+            <div id="systemInfo" class="result"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = './api/';
+
+        async function testDatabase() {
+            const resultDiv = document.getElementById('dbResult');
+            resultDiv.innerHTML = 'Probando conexión...';
+
+            try {
+                const response = await fetch(API_BASE + 'leaderboard.php?limit=1');
+                const data = await response.json();
+
+                if (data.success) {
+                    resultDiv.innerHTML = '<span class="success">✅ Conexión exitosa a la base de datos!</span>\n' +
+                        JSON.stringify(data, null, 2);
+                } else {
+                    resultDiv.innerHTML = '<span class="error">❌ Error: ' + data.error + '</span>';
+                }
+            } catch (error) {
+                resultDiv.innerHTML = '<span class="error">❌ Error de conexión: ' + error.message + '</span>';
+            }
+        }
+
+        async function testSaveScore() {
+            const resultDiv = document.getElementById('saveResult');
+            const username = document.getElementById('testUsername').value;
+            const score = parseInt(document.getElementById('testScore').value);
+
+            if (!username || !score) {
+                resultDiv.innerHTML = '<span class="error">❌ Por favor ingresa nombre y puntuación</span>';
+                return;
+            }
+
+            resultDiv.innerHTML = 'Guardando puntuación...';
+
+            try {
+                const response = await fetch(API_BASE + 'save-score.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                        score: score,
+                        level: Math.floor(score / 100),
+                        ballsCount: Math.floor(Math.random() * 20) + 1
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    resultDiv.innerHTML = '<span class="success">✅ Puntuación guardada exitosamente!</span>\n' +
+                        'Nuevo récord: ' + (data.isNewRecord ? 'Sí' : 'No') + '\n' +
+                        'Ranking: #' + data.ranking + '\n' +
+                        JSON.stringify(data, null, 2);
+                } else {
+                    resultDiv.innerHTML = '<span class="error">❌ Error: ' + data.error + '</span>';
+                }
+            } catch (error) {
+                resultDiv.innerHTML = '<span class="error">❌ Error: ' + error.message + '</span>';
+            }
+        }
+
+        async function testLeaderboard() {
+            const resultDiv = document.getElementById('leaderboardResult');
+            resultDiv.innerHTML = 'Cargando leaderboard...';
+
+            try {
+                const response = await fetch(API_BASE + 'leaderboard.php?limit=10');
+                const data = await response.json();
+
+                if (data.success) {
+                    let html = '<span class="success">✅ Leaderboard cargado exitosamente!</span>\n\n';
+                    html += 'Top ' + data.total + ' jugadores:\n\n';
+
+                    data.leaderboard.forEach((entry, index) => {
+                        html += `${index + 1}. ${entry.username} - ${entry.best_score} puntos (Nivel ${entry.best_level})\n`;
+                    });
+
+                    html += '\n' + JSON.stringify(data, null, 2);
+                    resultDiv.innerHTML = html;
+                } else {
+                    resultDiv.innerHTML = '<span class="error">❌ Error: ' + data.error + '</span>';
+                }
+            } catch (error) {
+                resultDiv.innerHTML = '<span class="error">❌ Error: ' + error.message + '</span>';
+            }
+        }
+
+        function showSystemInfo() {
+            const resultDiv = document.getElementById('systemInfo');
+
+            const info = {
+                'User Agent': navigator.userAgent,
+                'Plataforma': navigator.platform,
+                'Idioma': navigator.language,
+                'Canvas soportado': 'getContext' in document.createElement('canvas'),
+                'LocalStorage soportado': typeof(Storage) !== 'undefined',
+                'Touch soportado': 'ontouchstart' in window,
+                'Resolución': window.screen.width + 'x' + window.screen.height,
+                'Viewport': window.innerWidth + 'x' + window.innerHeight
+            };
+
+            let html = '<span class="success">ℹ️ Información del Sistema:</span>\n\n';
+            for (const [key, value] of Object.entries(info)) {
+                html += `${key}: ${value}\n`;
+            }
+
+            resultDiv.innerHTML = html;
+        }
+
+        // Auto-test al cargar
+        window.addEventListener('load', () => {
+            console.log('Página de test cargada. Ejecuta las pruebas manualmente.');
+        });
+    </script>
+</body>
+</html>

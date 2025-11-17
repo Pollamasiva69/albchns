@@ -1,0 +1,31 @@
+# Configuración de base de datos
+database/config.php
+
+# Archivos de sistema
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Temporales
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+
+# Carpetas de IDE
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Node modules (si se usan en el futuro)
+node_modules/
+package-lock.json
+yarn.lock
+
+# Archivos de backup
+*.bak
+*.backup
