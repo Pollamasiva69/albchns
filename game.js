@@ -20,7 +20,7 @@ const gameState = {
     username: localStorage.getItem('username') || '',
     score: 0,
     level: 1,
-    ballsCount: 1,
+    ballsCount: 10,
     bestScore: parseInt(localStorage.getItem('bestScore')) || 0,
     bestLevel: parseInt(localStorage.getItem('bestLevel')) || 0,
     isPlaying: false,
@@ -431,7 +431,7 @@ function startGame() {
     // Resetear estado
     gameState.score = 0;
     gameState.level = 1;
-    gameState.ballsCount = 1;
+    gameState.ballsCount = 10;
     gameState.balls = [];
     gameState.blocks = [];
     gameState.powerups = [];
