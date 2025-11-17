@@ -18,60 +18,70 @@ Un emocionante juego HTML5 estilo "Balls Versus Blocks" completamente optimizado
 
 ```
 .
-├── index.html          # Página principal del juego
-├── style.css           # Estilos y animaciones
-├── game.js             # Lógica del juego
+├── index.html             # Página principal del juego
+├── style.css              # Estilos y animaciones
+├── game.js                # Lógica del juego
+├── install.sh             # Instalador automático (Linux/Mac)
+├── install.bat            # Instalador automático (Windows)
+├── install.php            # Instalador web desde navegador
+├── test-api.html          # Herramienta de prueba de API
 ├── api/
 │   ├── save-score.php     # API para guardar puntuaciones
 │   └── leaderboard.php    # API para obtener clasificación
 └── database/
     ├── schema.sql         # Esquema de base de datos
-    └── config.php         # Configuración de conexión
+    ├── config.php         # Configuración de conexión (generado)
+    └── config.example.php # Ejemplo de configuración
 ```
 
 ## 🚀 Instalación
 
-### 1. Configurar Base de Datos
+### ⚡ Instalación Automática (RECOMENDADO)
 
-1. Importa el esquema de base de datos:
+La forma más fácil de instalar es usando los scripts automáticos:
+
+**Linux/Mac:**
 ```bash
-mysql -u root -p < database/schema.sql
+chmod +x install.sh
+./install.sh
 ```
 
-2. Edita `database/config.php` con tus credenciales:
-```php
-define('DB_HOST', 'localhost');
-define('DB_NAME', 'balls_vs_blocks');
-define('DB_USER', 'tu_usuario');
-define('DB_PASS', 'tu_contraseña');
+**Windows:**
+```batch
+install.bat
 ```
 
-### 2. Configurar Servidor Web
+**Desde el Navegador (XAMPP/WAMP/MAMP):**
+1. Copia el proyecto a `htdocs/` o `www/`
+2. Inicia Apache y MySQL
+3. Ve a `http://localhost/albchns/install.php`
+4. Sigue el asistente de instalación
 
-**Opción A: Servidor local con PHP**
+El instalador automático:
+- ✅ Crea la base de datos con nombre personalizado
+- ✅ Importa el esquema completo
+- ✅ Genera `database/config.php` automáticamente
+- ✅ Verifica la instalación
+- ✅ Inserta datos de prueba (opcional)
+
+### 📝 Instalación Manual
+
+Si prefieres instalar manualmente, consulta [INSTALL.md](INSTALL.md) para instrucciones detalladas.
+
+### Iniciar el Servidor
+
+**Opción A: PHP built-in server**
 ```bash
 php -S localhost:8000
 ```
 
-**Opción B: Apache/Nginx**
-- Copia todos los archivos a tu directorio web (ej: `/var/www/html/`)
-- Asegúrate de que PHP esté instalado y configurado
-- Accede mediante tu navegador
-
-**Opción C: XAMPP/WAMP/MAMP**
-- Copia el proyecto a la carpeta `htdocs`
-- Inicia Apache y MySQL
+**Opción B: XAMPP/WAMP/MAMP**
+- Ya está listo si instalaste con `install.php`
 - Accede a `http://localhost/albchns/`
 
-### 3. Configurar API URL
+### Verificar Instalación
 
-En `game.js`, modifica la URL base de la API si es necesario:
-```javascript
-const CONFIG = {
-    API_BASE_URL: './api/', // Cambia esto según tu configuración
-    // ... resto de configuración
-};
-```
+Abre `http://localhost:8000/test-api.html` y prueba todas las funciones
 
 ## 🎯 Cómo Jugar
 

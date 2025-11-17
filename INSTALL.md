@@ -1,6 +1,38 @@
 # 📦 Guía de Instalación Rápida
 
-## ⚡ Instalación en 5 Minutos
+## 🚀 Instalación Automática (RECOMENDADO)
+
+¡Ahora puedes instalar todo automáticamente con un solo comando!
+
+### Para Linux/Mac:
+```bash
+chmod +x install.sh
+./install.sh
+```
+
+### Para Windows:
+```batch
+install.bat
+```
+
+### Desde el Navegador Web:
+1. Copia el proyecto a tu servidor web (XAMPP/WAMP/MAMP)
+2. Inicia Apache y MySQL
+3. Accede a `http://localhost/albchns/install.php`
+4. Sigue las instrucciones en pantalla
+
+**¿Qué hace el instalador automático?**
+- ✅ Crea la base de datos con un nombre personalizado
+- ✅ Importa todo el esquema (tablas, índices, vistas)
+- ✅ Genera automáticamente `database/config.php`
+- ✅ Verifica que todo funcione correctamente
+- ✅ Opcionalmente inserta datos de prueba
+
+---
+
+## 📝 Instalación Manual
+
+Si prefieres hacerlo manualmente, sigue estos pasos:
 
 ### Paso 1: Descargar el Proyecto
 ```bash
