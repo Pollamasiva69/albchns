@@ -20,23 +20,44 @@ if not exist "database\schema.sql" (
     exit /b 1
 )
 
-echo Por favor, proporciona los siguientes datos:
-echo.
+echo ¿Usar configuración rápida? (root/1234) [S/n]:
+set /p QUICK_MODE=""
+if "%QUICK_MODE%"=="" set QUICK_MODE=S
 
-REM Solicitar datos de configuración
-set /p DB_NAME="Nombre de la base de datos [balls_vs_blocks_game]: "
-if "%DB_NAME%"=="" set DB_NAME=balls_vs_blocks_game
+if /i "%QUICK_MODE%"=="S" (
+    REM Configuración rápida
+    set DB_NAME=balls_vs_blocks_game
+    set DB_HOST=localhost
+    set DB_USER=root
+    set DB_PASS=1234
+    set DB_PORT=3306
 
-set /p DB_HOST="Host de MySQL [localhost]: "
-if "%DB_HOST%"=="" set DB_HOST=localhost
+    echo.
+    echo ✅ Usando configuración rápida:
+    echo   DB: balls_vs_blocks_game
+    echo   Usuario: root
+    echo   Contraseña: ****
+    echo.
+) else (
+    echo Por favor, proporciona los siguientes datos:
+    echo.
 
-set /p DB_USER="Usuario de MySQL [root]: "
-if "%DB_USER%"=="" set DB_USER=root
+    REM Solicitar datos de configuración
+    set /p DB_NAME="Nombre de la base de datos [balls_vs_blocks_game]: "
+    if "%DB_NAME%"=="" set DB_NAME=balls_vs_blocks_game
 
-set /p DB_PASS="Contraseña de MySQL: "
+    set /p DB_HOST="Host de MySQL [localhost]: "
+    if "%DB_HOST%"=="" set DB_HOST=localhost
 
-set /p DB_PORT="Puerto de MySQL [3306]: "
-if "%DB_PORT%"=="" set DB_PORT=3306
+    set /p DB_USER="Usuario de MySQL [root]: "
+    if "%DB_USER%"=="" set DB_USER=root
+
+    set /p DB_PASS="Contraseña de MySQL [1234]: "
+    if "%DB_PASS%"=="" set DB_PASS=1234
+
+    set /p DB_PORT="Puerto de MySQL [3306]: "
+    if "%DB_PORT%"=="" set DB_PORT=3306
+)
 
 echo.
 echo ═══════════════════════════════════════════════════

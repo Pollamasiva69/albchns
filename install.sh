@@ -42,29 +42,49 @@ if [ ! -f "database/schema.sql" ]; then
     exit 1
 fi
 
-# Solicitar datos de configuración
-echo -e "${YELLOW}Por favor, proporciona los siguientes datos:${NC}"
-echo ""
+# Modo rápido con valores por defecto
+echo -e "${YELLOW}¿Usar configuración rápida? (root/1234) [S/n]: ${NC}"
+read -p "" QUICK_MODE
+QUICK_MODE=${QUICK_MODE:-S}
 
-# Nombre de la base de datos
-read -p "Nombre de la base de datos [balls_vs_blocks_game]: " DB_NAME
-DB_NAME=${DB_NAME:-balls_vs_blocks_game}
+if [[ $QUICK_MODE =~ ^[Ss]$ ]]; then
+    # Configuración rápida
+    DB_NAME="balls_vs_blocks_game"
+    DB_HOST="localhost"
+    DB_USER="root"
+    DB_PASS="1234"
+    DB_PORT="3306"
 
-# Host
-read -p "Host de MySQL [localhost]: " DB_HOST
-DB_HOST=${DB_HOST:-localhost}
+    echo -e "${GREEN}✅ Usando configuración rápida:${NC}"
+    echo -e "  DB: ${BLUE}$DB_NAME${NC}"
+    echo -e "  Usuario: ${BLUE}$DB_USER${NC}"
+    echo -e "  Contraseña: ${BLUE}****${NC}"
+else
+    # Solicitar datos de configuración
+    echo -e "${YELLOW}Por favor, proporciona los siguientes datos:${NC}"
+    echo ""
 
-# Usuario
-read -p "Usuario de MySQL [root]: " DB_USER
-DB_USER=${DB_USER:-root}
+    # Nombre de la base de datos
+    read -p "Nombre de la base de datos [balls_vs_blocks_game]: " DB_NAME
+    DB_NAME=${DB_NAME:-balls_vs_blocks_game}
 
-# Contraseña
-read -sp "Contraseña de MySQL: " DB_PASS
-echo ""
+    # Host
+    read -p "Host de MySQL [localhost]: " DB_HOST
+    DB_HOST=${DB_HOST:-localhost}
 
-# Puerto
-read -p "Puerto de MySQL [3306]: " DB_PORT
-DB_PORT=${DB_PORT:-3306}
+    # Usuario
+    read -p "Usuario de MySQL [root]: " DB_USER
+    DB_USER=${DB_USER:-root}
+
+    # Contraseña
+    read -sp "Contraseña de MySQL [1234]: " DB_PASS
+    echo ""
+    DB_PASS=${DB_PASS:-1234}
+
+    # Puerto
+    read -p "Puerto de MySQL [3306]: " DB_PORT
+    DB_PORT=${DB_PORT:-3306}
+fi
 
 echo ""
 echo -e "${BLUE}═══════════════════════════════════════════════════${NC}"

@@ -425,8 +425,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 <div class="form-group">
                     <label>Contraseña de MySQL</label>
-                    <input type="password" name="db_pass">
-                    <div class="help-text">Déjalo vacío si no tienes contraseña</div>
+                    <input type="password" name="db_pass" value="1234">
+                    <div class="help-text">Por defecto: 1234 (déjalo vacío si no tienes contraseña)</div>
                 </div>
 
                 <div class="form-group">
